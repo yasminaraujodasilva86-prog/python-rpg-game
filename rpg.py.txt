@@ -1,0 +1,545 @@
+import random
+from colorama import Fore, Style
+
+nome = input('Digite o nome do herói: ')
+
+monstros = [
+    {'nome': 'globin', 'vida': 30},
+    {'nome': 'zuric', 'vida': 50},
+    {'nome': 'amobis', 'vida': 90}
+]
+chefes = [
+    {"nome": "Goblin Rei", "vida": 180, "ataque": 20, "dificuldade": "⭐"},
+    {"nome": "Cavaleiro Sombrio", "vida": 250, "ataque": 30, "dificuldade": "⭐⭐"},
+    {"nome": "Bruxa Suprema", "vida": 320, "ataque": 35, "dificuldade": "⭐⭐⭐"},
+    {"nome": "Dragão de Gelo", "vida": 450, "ataque": 45, "dificuldade": "⭐⭐⭐⭐"},
+    {"nome": "Titã de Pedra", "vida": 600, "ataque": 55, "dificuldade": "⭐⭐⭐⭐⭐"},
+    {"nome": "Fênix Ancestral", "vida": 700, "ataque": 60, "dificuldade": "⭐⭐⭐⭐⭐⭐"},
+    {"nome": "Rei Demônio", "vida": 900, "ataque": 70, "dificuldade": "⭐⭐⭐⭐⭐⭐⭐"},
+    {"nome": "Ceifador das Almas", "vida": 1100, "ataque": 80, "dificuldade": "⭐⭐⭐⭐⭐⭐⭐⭐"},
+    {"nome": "Deus Dragão", "vida": 1500, "ataque": 100, "dificuldade": "⭐⭐⭐⭐⭐⭐⭐⭐⭐"},
+    {"nome": "Criador do Caos", "vida": 2500, "ataque": 140, "dificuldade"
+    : "☠️ FINAL"}
+]
+motivos_reviver = [
+    "Uma fada curou suas feridas.",
+    "Um velho mago lançou um feitiço de ressurreição.",
+    "Um anjo ouviu suas preces e trouxe você de volta.",
+    "Seu pet pediu ajuda e salvou sua vida.",
+    "Uma poção lendária foi encontrada em seus bolsos.",
+    "Um curandeiro da vila encontrou você a tempo.",
+    "A deusa da luz lhe concedeu uma segunda chance.",
+    "Seu escudo mágico absorveu o golpe fatal.",
+    "Uma fênix derramou uma lágrima sobre você.",
+    "Você acordou misteriosamente em um templo antigo.",
+    "Um guerreiro desconhecido derrotou o inimigo e o resgatou.",
+    "Você foi teleportado para um lugar seguro.",
+    "O espírito da floresta restaurou sua energia.",
+    "Um dragão bondoso decidiu poupar sua vida.",
+]
+inventario = []
+itens_derrubados = [
+    {'nome': 'Elixir de Fúria', 'efeito': 'ataque'},
+    {'nome': 'Cristais de Energia', 'efeito': 'vida'},
+    {'nome': 'Amuleto de Raios', 'efeito': 'raio'},
+    {'nome': 'Pedra Lilás', 'efeito': 'choque'},
+    {'nome': 'Espada de Fogo', 'efeito': 'fogo'}
+]
+escudo = None
+pet = None
+bonus_pet = 0
+vida_max = 100
+pocao_pequena = 2
+pocao_media = 0
+pocao_grande = 0
+nivel = 1
+vida = 100
+ataque = 20
+ouro = 2000
+magia = 0
+xp = 0
+monstros_derrotados = 0
+chefes_derrotados = 0
+itens_coletados = 0
+ouro_ganho = 0
+
+while True:
+    print(Fore.GREEN + '\n=== MENU ===' + Style.RESET_ALL)
+    print('1 - Status')
+    print('2 - Lutar')
+    print('3 - Loja')
+    print('4 - Usar poção')
+    print('5 - Lutar com o chefão')
+    print('6 - Usar item do inventário')
+    print('7 - Estatísticas')
+    print('8 - Sair')
+
+    opcao = input('Escolha: ')
+
+    if opcao == '1':
+        print(f'Nome: {nome}')
+        print(f'Vida: {vida}/{vida_max}')
+        print(f'Ataque: {ataque}')
+        print(f'Ouro: {ouro}')
+        print(f'Poção Pequena: {pocao_pequena}')
+        print(f'Poção Média: {pocao_media}')
+        print(f'Poção Grande: {pocao_grande}')
+        print(f'Magia: {magia}')
+        print(f'Nível: {nivel}')
+        print(f'XP: {xp}/100')
+        print(f'Pet: {pet}')
+        print(f'Escudo: {escudo}')
+        print('Inventário:')
+        if len(inventario) == 0:
+            print('  [ Vazio ]')
+        else:
+            for item in inventario:
+                print(f'  -{item["nome"]} | Poder :{item["efeito"]}')
+    elif opcao == '2':
+        monstro = random.choice(monstros)
+        vida_monstro = monstro['vida']
+        ataque_temporario = 0 #zera o bônus do item a cada luta nova
+        print(f"\nUm {monstro['nome']} apareceu com {monstro['vida']} de vida!")
+        print('1 - Atacar')
+        print('2 - Fugir')
+        acao = input('ESCOLHA: ')
+        if acao == '2':
+            print('Você fugiu!')
+            continue
+
+        while vida_monstro > 0 and vida > 0:
+
+            dano_jogador = random.randint(10, ataque) + bonus_pet
+
+            # bônus por magia
+            if magia > 0:
+                dano_jogador += 5
+
+            vida_monstro -= dano_jogador
+            print(f'Você causou {dano_jogador} de dano!')
+
+            if vida_monstro <= 0:
+                monstros_derrotados += 1
+                recompensa = random.randint(10, 30)
+                ouro += recompensa
+                xp += 50
+                #A MENSAGEM DE VITÓRIA DEVE FICAR AQUI
+                print(f'\033[32mVocê venceu! ganhou {recompensa} moedas e 50xp!\033[m')
+                if xp >= 100:
+                    nivel += 1
+                    xp -= 100
+                    ataque += 5
+                    vida_max += 20
+                    vida = vida_max
+                    if vida > vida_max:
+                        vida = vida_max
+                    print('\033[32mVOCÊ SUBIU DE NÍVEL!!\033[m')
+                    print(f'Agora você está no nível {nivel}!')
+
+                if random.randint(1, 100) <= 30:
+                    item_sorteado = random.choice(itens_derrubados)
+                    print(f'\033[35m\nVocê encontrou um {item_sorteado["nome"]} caído no chão!\033[m')
+                    print(f'\033[36mAnalisando esse item...{item_sorteado["nome"]}|poder: {item_sorteado["efeito"]}\033[m')
+
+                    pegar = input('Deseja guardar no inventário? (sim/não): ')
+                    if pegar.lower() == 'sim':
+                        inventario.append(item_sorteado)
+                        print(f'Você guardou o {item_sorteado["nome"]}!')
+                    else:
+                        print('Você deixou o item pra trás.')
+                break
+
+            dano_monstro = random.randint(5, 15)
+            vida -= dano_monstro
+            print(f'O monstro causou {dano_monstro} de dano!')
+
+            if vida < 0:
+                vida = 0
+                print(f'Sua vida: {vida}')
+
+                if vida <= 0:
+                    print('Você foi derrotada...')
+                    reiniciar = str(input('Deseja reiniciar? (sim/não): '))
+                    if reiniciar.lower() == 'não' or reiniciar.lower() == 'nao':
+                        # Força a quebra de toda a estrutura para voltar ao menu ou finalizar
+                        vida = 0
+                    else:
+                        vida = 100
+                        ouro = 50
+                        ataque = 20
+                        nivel = 1
+                        xp = 0
+                        magia = 0
+                        vida_max = 100
+                        pocao_pequena = 2
+                        pocao_media = 0
+                        pocao_grande = 0
+                    break  # Sai do combate
+
+    elif opcao == '3':
+        print('\n=== LOJA ===')
+        print(f'Ouro disponível: {ouro}')
+        print('\033[36mVarinha mágica = 50 moedas\033[m')
+        print('\033[36mVassoura voadora = 70 moedas\033[m')
+        print('\033[36mRaio lazer = 85 moedas\033[m')
+
+        print('\033[35m=== POÇÕES ===\033[m')
+        print('1 - Pequena')
+        print('2 - Média')
+        print('3 - Grande')
+
+        print('\033[35m=== LOJA DE PETS ===\033[m')
+        print('\033[36mLobo branco = 100 moedas\033[m')
+        print('\033[36mGato preto = 150 moedas\033[m')
+        print('\033[36mFênix = 200 moedas\033[m')
+        print('\033[36mPavão branco = 190 moedas\033[m')
+
+        print('\033[35m=== LOJA DE ESCUDOS ===\033[m')
+        print('\033[36mEscudo de couro = 20 moedas\033[m')
+        print('\033[36mEscudo de ferro = 50 moedas\033[m')
+        print('\033[36mEscudo de ouro = 80 moedas\033[m')
+        print('\033[36mEscudo de diamante = 120 moedas\033[m')
+        print('\033[36mEscudo de titânio = 200 moedas\033[m')
+
+        item = input('O que deseja comprar? ')
+
+        if item.lower() == 'poção':
+            print('1 - Pequena (20 moedas)')
+            print('2 - Média (40 moedas)')
+            print('3 - Grande (70 moedas)')
+
+            escolha = input('Escolha: ')
+
+            if escolha == '1':
+                if ouro >= 20:
+                    ouro -= 20
+                    pocao_pequena += 1
+                    print('Poção pequena comprada!')
+                else:
+                    print('Ouro insuficiente!')
+
+            elif escolha == '2':
+                if ouro >= 40:
+                    ouro -= 40
+                    pocao_media += 1
+                    print('Poção média comprada!')
+                else:
+                    print('Ouro insuficiente!')
+
+            elif escolha == '3':
+                if ouro >= 70:
+                    ouro -= 70
+                    pocao_grande += 1
+                    print('Poção grande comprada!')
+                else:
+                    print('Ouro insuficiente!')
+
+            else:
+                print('Opção inválida!')
+
+        elif item.lower() == 'varinha mágica':
+            if ouro >= 50:
+                ouro -= 50
+                magia += 1
+                print('Varinha mágica comprada!')
+            else:
+                print('Ouro insuficiente!')
+
+        elif item.lower() == 'vassoura voadora':
+            if ouro >= 70:
+                ouro -= 70
+                magia += 2
+                print('Vassoura voadora comprada!')
+            else:
+                print('Ouro insuficiente!')
+
+        elif item.lower() == 'raio lazer':
+            if ouro >= 85:
+                ouro -= 85
+                ataque += 15
+                print('Raio lazer comprado!')
+            else:
+                print('Ouro insuficiente!')
+
+        elif item.lower() == 'lobo branco':
+            if pet == None:
+                if ouro >= 100:
+                    ouro -= 100
+                    pet = 'Lobo'
+                    bonus_pet = 5
+                    print('Você adotou um Lobo branco!')
+                else:
+                    print('Ouro insuficiente!')
+            else:
+                print('Você já possui um pet!')
+
+        elif item.lower() == 'gato preto':
+            if pet == None:
+                if ouro >= 150:
+                    ouro -= 150
+                    pet = 'Gato preto'
+                    bonus_pet = 5
+                    print('Você adotou um gato preto!')
+                else:
+                    print('Ouro insuficiente!')
+
+            else:
+                print('Você já possui um pet!')
+
+        elif item.lower() == 'fênix':
+            if pet == None:
+                if ouro >= 200:
+                    ouro -= 200
+                    pet = 'Fênix'
+                    bonus_pet = 50
+                    print('Você adotou uma Fênix!')
+                else:
+                    print('Ouro insuficiente!')
+            else:
+                print('Você já possui um pet!')
+
+        elif item.lower() == 'pavão branco':
+            if pet == None:
+                if ouro >= 190:
+                    ouro -= 190
+                    pet = 'Pavão Branco'
+                    bonus_pet = 40
+                else:
+                    print('Ouro insuficiente!')
+            else:
+                print('Você já possui um pet!')
+
+        elif item.lower() == 'escudo de couro':
+            if escudo == None:
+                if ouro >= 20:
+                    ouro -= 20
+                    vida_max += 10
+                    vida += 10
+                    escudo = 'escudo de couro'
+                    print('Escudo de couro e proteção 10 adquiridos!')
+                else:
+                    print('Ouro insuficiente!')
+            else:
+                jaTem = input('Você já tem escudo. Deseja trocar?(sim/nao): ')
+                if jaTem.lower() == 'sim':
+                    escudo = 'escudo de couro'
+                    print(f'Pronto! Agora você tem o {escudo}!')
+                else:
+                    print('OK! compra cancelada.')
+
+        elif item.lower() == 'escudo de ferro':
+            if escudo == None:
+                if ouro >= 50:
+                    ouro -= 50
+                    vida_max += 30
+                    vida += 30
+                    escudo = 'escudo de ferro'
+                    print('Escudo de ferro e proteção 30 adquiridos!')
+                else:
+                    print('Ouro insuficiente!')
+            else:
+                jaTem = input('Você já tem escudo. Deseja trocar?(sim/nao): ')
+                if jaTem.lower() == 'sim':
+                    escudo = 'escudo de ferro'
+                    print(f'Pronto! Agora você tem o {escudo}!')
+                else:
+                    print('OK! compra cancelada.')
+
+        elif item.lower() == 'escudo de ouro':
+            if escudo == None:
+                if ouro >= 80:
+                    ouro -= 80
+                    vida_max += 60
+                    vida += 60
+                    escudo = 'escudo de ouro'
+                    print('Escudo de ouro e proteção 60 adquiridos!')
+                else:
+                    print('Ouro insuficiente!')
+            else:
+                jaTem = input('Você já tem escudo. Deseja trocar?(sim/nao): ')
+                if jaTem.lower() == 'sim':
+                    escudo = 'escudo de ouro'
+                    print(f'Pronto! Agora você tem o {escudo}!')
+                else:
+                    print('OK! compra cancelada.')
+
+        elif item.lower() == 'escudo de diamante':
+            if escudo == None:
+                if ouro >= 120:
+                    ouro -= 120
+                    vida_max += 100
+                    escudo = 'escudo de diamante'
+                    print('Escudo de diamante e proteção 100 adquiridos!')
+                else:
+                    print('Ouro insuficiente!')
+            else:
+                jaTem = input('Você já tem escudo. Deseja trocar?(sim/nao): ')
+                if jaTem.lower() == 'sim':
+                    escudo = 'escudo de diamante'
+                    print(f'Pronto! Agora você tem o {escudo}!')
+                else:
+                    print('OK! compra cancelada.')
+
+        elif item.lower() == 'escudo de titânio':
+            if escudo == None:
+                if ouro >= 200:
+                    ouro -= 200
+                    vida_max += 200
+                    escudo = 'escudo de titãnio'
+                    print('Escudo de titânio e proteção 200 adquiridos!')
+                else:
+                    print('Ouro insuficiente!')
+            else:
+                jaTem = input('Você já tem escudo. Deseja trocar?(sim/nao): ')
+                if jaTem.lower() == 'sim':
+                    escudo = 'escudo de titânio'
+                    print(f'Pronto! Agora você tem o {escudo}!')
+                else:
+                    print('OK! compra cancelada.')
+
+        else:
+            print('Item não encontrado!')
+
+    elif opcao == '4':
+        print('\n=== POÇÕES ===')
+        print('1 - Pequena (+20 vida)')
+        print('2 - Média (+50 vida)')
+        print('3 - Grande (+80 vida)')
+
+        escolha = input('Escolha: ')
+
+        if escolha == '1':
+            if pocao_pequena > 0:
+                vida += 20
+                pocao_pequena -= 1
+                print('Você recuperou 20 de vida!')
+            else:
+                print('Você não tem poções pequenas!')
+
+        elif escolha == '2':
+            if pocao_media > 0:
+                vida += 50
+                pocao_media -= 1
+                print('Você recuperou 50 de vida!')
+            else:
+                print('Você não tem poções médias!')
+
+        elif escolha == '3':
+            if pocao_grande > 0:
+                vida += 80
+                pocao_grande -= 1
+                print('Você recuperou 80 de vida!')
+            else:
+                print('Você não tem poções grandes!')
+
+        if vida > vida_max:
+            vida = vida_max
+
+    elif opcao == '5':
+        chefe = random.choice(chefes)
+        print(f"Chefe: {chefe['nome']}")
+        print(f"Vida: {chefe['vida']}")
+        print(f"Ataque: {chefe['ataque']}")
+        print(f"Dificuldade: {chefe['dificuldade']}")
+
+        lutar = input('Deseja lutar ou fugir?: ').lower()
+        if lutar == 'fugir':
+            print('Você fugiu do chefão com medo...')
+
+        elif lutar == 'lutar':
+            vida_chefe = chefe['vida']
+
+            print(f'Você entrou na batalha contra {chefe["nome"]}!')
+
+            while vida_chefe > 0 and vida > 0:
+
+                dano_jogador = random.randint(10,ataque) + bonus_pet
+                if magia > 0:
+                    dano_jogador += 5
+
+                vida_chefe -= dano_jogador
+                print(f'Você causou {dano_jogador} de dano no chefe!')
+
+                if vida_chefe <= 0:
+                    print(f'VOCÊ DERROTOU {chefe["nome"]}!')
+                    chefes_derrotados += 1
+                    ouro += 100
+                    xp += 100
+                    break
+
+                dano_chefe = random.randint(10, chefe['ataque'])
+                vida -= dano_chefe
+
+                print(f'O chefe causou {dano_chefe} de dano em você!')
+                print(f'Sua vida: {vida}')
+
+                if vida <= 0:
+                    print('\nVocê foi derrotado pelo chefão...')
+
+                    chance_reviver = random.randint(1, 100)
+
+                    if chance_reviver <= 50:  # 50% de chance de reviver
+                        motivo = random.choice(motivos_reviver)
+                        print(f'\033[35mMas... {motivo}\033[m')
+
+                        vida = vida_max // 2
+                        print('Você reviveu com metade da vida!')
+                    else:
+                        print('Sua alma não conseguiu voltar...')
+                        print('O jogo será reiniciado!')
+
+                        # RESET DO JOGO
+                        vida = 100
+                        vida_max = 100
+                        ataque = 20
+                        ouro = 50
+                        nivel = 1
+                        xp = 0
+                        magia = 0
+
+                        pocao_pequena = 2
+                        pocao_media = 0
+                        pocao_grande = 0
+
+                        pet = None
+                        escudo = None
+                        bonus_pet = 0
+
+                        break
+    elif opcao == '6':
+        if len(inventario) == 0:
+            print('\033[31mSeu inventário está vazio!\033[m')
+            continue
+        print('\n=== SEUS ITENS ===')
+        for indice, item in enumerate(inventario):
+            print(f'{indice + 1} - {item["nome"]} (Efeito: {item["efeito"]})')
+        escolha = input('Digite o número do item que quer usar (ou "sair"): ')
+        if escolha.lower != 'sair' and escolha.isdigit():
+            idx = int(escolha) - 1
+            if 0 <= idx < len(inventario):
+                item_usado = inventario.pop(idx)  # Remove do inventário ao usar
+
+                # Aplica o efeito do item de forma permanente!
+                if item_usado['efeito'] == 'ataque' or item_usado['efeito'] == 'fogo':
+                    ataque += 10
+                    print(f'\nVocê usou {item_usado["nome"]}! Seu ataque subiu +10 permanentemente!')
+                elif item_usado['efeito'] == 'vida':
+                    vida_max += 30
+                    vida += 30
+                    print(f'\nVocê usou {item_usado["nome"]}! Sua vida máxima subiu +30!')
+                else:
+                    ataque += 5
+                    print(f'\nVocê usou {item_usado["nome"]}! Seu ataque subiu +5!')
+            else:
+                print('Número inválido!')
+
+    elif opcao == '7':
+        print('\033[35m====== ESTATÍSTICAS ====== \033[m')
+        print(f'Monstros derrotados: {monstros_derrotados}')
+        print(f'Chefões derrotados: {chefes_derrotados}')
+        print(f'Ouro ganho: {ouro_ganho}')
+        print(f'Itens coletados: {itens_coletados}')
+        print(f'Nível máximo: {nivel}')
+
+    else:
+        print('Opção inválida!')
